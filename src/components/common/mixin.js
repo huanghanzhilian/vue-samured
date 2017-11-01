@@ -44,10 +44,13 @@ export const payleEvent = {
     directives: {
         'payle-event': {
             bind: (el, binding) => {
+                //抛出播放器初始化设置
+                binding.value.playInit(el);
+
                 //console.log(binding.expression.selectBtnStatus)
                 let self  = this;
                 this.event = function (event) {
-                    console.log(event.keyCode)
+                    //console.log(event.keyCode)
                     //播放器暂停/播放
                     if(event.keyCode==32){
                         binding.value.isPlay(el);
@@ -58,7 +61,6 @@ export const payleEvent = {
                 //点击空白事件
                 this.clickbaidl=function(){
                     binding.value.setSelectBtnStatus();
-                    console.log(1)
                 };
 
                 //获取vidle宽度
