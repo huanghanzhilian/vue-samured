@@ -6,7 +6,7 @@
                 <ul class="banner_ul">
                     <transition name="slide-trans">
                         <li class="channel_banner_li" v-if="isShow">
-                            <a href="/" @click.prevent>
+                            <a :href="'/detailTv?gameId='+slides[nowIndex].objectId" @click.prevent="channelDetails(slides[nowIndex].objectId)">
                                 <div class="banner_left_box">
                                     <img v-if="slides[nowIndex].img" :src="imgBaseUrl+slides[nowIndex].img" alt="">
                                     <img v-else src="../../assets/datu.jpg" alt="">
@@ -18,8 +18,11 @@
                                         <div class="item_info_box">
                                             <div class="b_r_title">{{slides[nowIndex].riName}}</div>
                                             <div class="b_r_username">{{slides[nowIndex].yingName}}</div>
-                                            <div class="b_r_order_box">
-                                                <span class="order_title">订阅</span>12
+                                            <div class="b_r_order_box" v-if="slides[nowIndex].state" @click="orderBtn(slides[nowIndex].objectId)">
+                                                <span class="order_title">订阅</span>{{slides[nowIndex].subscribed_num}}
+                                            </div>
+                                            <div class="b_r_order_box order_box1" v-else>
+                                                <span class="order_title">已订阅</span>{{slides[nowIndex].subscribed_num}}
                                             </div>
                                         </div>
                                     </div>
@@ -56,7 +59,7 @@
                     </transition>
                     <transition name="slide-trans-old">
                         <li class="channel_banner_li" v-if="!isShow">
-                            <a href="/" @click.prevent>
+                            <a :href="'/detailTv?gameId='+slides[nowIndex].objectId" @click.prevent="channelDetails(slides[nowIndex].objectId)">
                                 <div class="banner_left_box">
                                     <img v-if="slides[nowIndex].img" :src="imgBaseUrl+slides[nowIndex].img" alt="">
                                     <img v-else src="../../assets/datu.jpg" alt="">
@@ -68,8 +71,11 @@
                                         <div class="item_info_box">
                                             <div class="b_r_title">{{slides[nowIndex].riName}}</div>
                                             <div class="b_r_username">{{slides[nowIndex].yingName}}</div>
-                                            <div class="b_r_order_box">
-                                                <span class="order_title">订阅</span>12
+                                            <div class="b_r_order_box" v-if="slides[nowIndex].state" @click="orderBtn(slides[nowIndex].objectId)">
+                                                <span class="order_title">订阅</span>{{slides[nowIndex].subscribed_num}}
+                                            </div>
+                                            <div class="b_r_order_box order_box1" v-else>
+                                                <span class="order_title">已订阅</span>{{slides[nowIndex].subscribed_num}}
                                             </div>
                                         </div>
                                     </div>
@@ -114,6 +120,7 @@
 <script>
 import { imgBaseUrl } from '@/config/env';
 import {timeCycle} from '@/config/mUtils';
+import { subsCribe } from '@/api/index';
 export default {
     //数据
     data() {
@@ -121,7 +128,8 @@ export default {
             imgBaseUrl,
             nowIndex: 0,
             isShow: true,
-            timeCycle
+            timeCycle,
+            test:true
         }
     },
     //开始创建  vue后自动执行
@@ -179,6 +187,17 @@ export default {
                 this.isShow = true
                 this.nowIndex = index
             }, 10)
+        },
+        //订阅
+        async orderBtn(ids){
+            console.log(ids)
+            var params = {gameId:ids};
+            let res = await subsCribe(params);
+            console.log(res)
+        },
+        //进入频道详情页
+        channelDetails(obj){
+            this.$router.push({path:'/detailTv',query:{gameId:obj}});
         },
     },
 
@@ -240,13 +259,21 @@ export default {
                             box-sizing: border-box;
                             padding: 0 10px 0 0px;
                             .order_title{
-                                width: 40px;
+                                width: 50px;
                                 height: 100%;
                                 line-height: 20px;
                                 display: inline-block;
                                 color: #353535;
                                 background: #e34849;
                                 margin-right: 10px;
+                                padding: 0 5px;
+                            }
+                            &.order_box1{
+                                border: 1px solid #828282;
+                                .order_title{
+                                    background: #828282;
+                                    color: #eee;
+                                }
                             }
                         }
                         .b_r_title{

@@ -7,6 +7,8 @@ const gameClass = r => require.ensure([], () => r(require('../page/gameClass/gam
 const login = r => require.ensure([], () => r(require('../page/login/login')), 'login');
 //播放页
 const watch = r => require.ensure([], () => r(require('../page/Watch/Watch')), 'Watch');
+//频道详情
+const detailTv = r => require.ensure([], () => r(require('../page/detailTv/detailTv')), 'detailTv');
 
 Vue.use(Router)
 export default new Router({
@@ -27,6 +29,9 @@ export default new Router({
         },{
             path: 'watch',
             component: watch
+        },{
+            path: 'detailTv',
+            component: detailTv
         }]
     }, {
         path: '/login',

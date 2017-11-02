@@ -40,3 +40,13 @@ export const logout = (params) => {
 export const getvideo = (params) => {
   return http.fetchPost('/api/video/play',params)
 }
+
+//订阅接口
+export const subsCribe = (params) => {
+  return http.fetchPost('/api/channel/sub',params)
+}
+
+//频道详情页
+export const channelDetails = (params) => {
+  return http.fetchPost('/api/channel/info',params)
+}

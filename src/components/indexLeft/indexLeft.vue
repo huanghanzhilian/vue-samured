@@ -9,7 +9,7 @@
                             <i class="iconfont icon-shouye left_icon"></i>
                             首页{{loadingAnimation}}
                         </div>
-                        <div class="tab-item" :class="[{go_btn :$route.path.indexOf('LookChannel') !== -1}]" @click="goTab('/LookChannel')">
+                        <div class="tab-item" :class="[{go_btn :$route.path.indexOf('LookChannel')!== -1||$route.path.indexOf('detailTv')!== -1}]"  @click="goTab('/LookChannel')">
                             <i class="iconfont icon-liulanpindao1 left_icon"></i>
                             浏览频道
                         </div>

@@ -2,12 +2,12 @@
     <!-- 组件盒子 -->
     <div class="player_container" v-if="playerData">
         <div class="player_in_box" @mousemove="moveIbv($event)" @mouseover="clearInv($event)" @mouseout="runInv" ref="playerInBox">
-            <video ref="payleSize" v-payle-event="{loaderMore,isPlay,fullScreen,setvideoLoadWidth,setItem,getWinWids,setSelectBtnStatus,playInit}" preload="load" class="player_video" autoplay="true" :src="playMiveoUrl"></video>
+            <video ref="payleSize" v-payle-event="{loaderMore,isPlay,fullScreen,setvideoLoadWidth,setItem,getWinWids,setSelectBtnStatus,playInit,isMouseDown,isMouseDownFn,winMoverFn}" preload="load" class="player_video" autoplay="true" :src="playMiveoUrl"></video>
             <div class="player_control" :class="{hoverShow:isHoverShow,hoverHide:!isHoverShow}">
-                <div class="v_progress_box">
+                <div class="v_progress_box" @mousedown="playLinemoveSet($event)">
                     <div class="v_progress_active_x" :style="{width: player.videoLoadWidth+ '%' }"></div>
                     <div class="v_progress_x_box"></div>
-                    <div class="v_progress_x" :style="{width:playTimeLine+'%'}">
+                    <div class="v_progress_x" :style="{width:player.playTimeLine+'%'}">
                         <div class="v_progress_point"></div>
                     </div>
                 </div>
@@ -24,7 +24,7 @@
                             <i v-if="player.muted == 1" class="iconfont icon-dayinliang"></i>
                             <i v-else class="iconfont icon-jingyin"></i>
                             <transition name="mutedLineShow">
-                                <div v-show="mutedLineStatus" class="v_muted_box" ref="abc_1" v-on:click.stop="changeMuted($event)" @mousedown="mutedDown($event)" >
+                                <div v-show="mutedLineStatus" class="v_muted_box" ref="abc_1" v-on:click.stop="changeMuted($event)" >
                                     <div class="line_out">
                                         <div class="line_in v_muted_x" :style="{width: (player.volume*100)+ '%' }">
                                             <div class="line_in_point"></div>
@@ -102,6 +102,8 @@ export default {
 
             playMiveotext:'',//播放视频类型中文
             playMiveoUrl:'',//播放视频类型url
+
+            isMouseDown:false,//是否正在执行拖动事件 对document的监听
         }
     },
     created(){
@@ -151,10 +153,10 @@ export default {
         },
 
         //播放时间线计算
-        playTimeLine(){
+        /*playTimeLine(){
             var sekd=this.player.playTime/this.player.duraTion*100;//this.player.playWidth;
             return sekd;
-        }
+        }*/
     },
     updated() {
         // console.log(this.supportIds, this.sortByType)
@@ -169,6 +171,44 @@ export default {
             //获取数据后查看本地是否有选择默认影片类型
             this.forMoiveType(getStore('setMovieType'))
         },
+        //按下进度条
+        playLinemoveSet(event){
+            event = event || window.event;
+            this.setSelectable(document.body, false);
+            this.isMouseDown=true;
+        },
+        //窗口滑动事件
+        winMoverFn(e,el){
+            if(this.isMouseDown){
+                el.pause();
+                var onjd=e.pageX-this.offset(el).left;
+                onjd = Math.max(0, onjd);
+                onjd = Math.min(onjd, el.offsetWidth);
+                var fuso=onjd/el.offsetWidth*100;
+                var videoSize=(fuso/100*this.player.duraTion);
+                this.player.playTimeLine=fuso;
+
+                el.currentTime=videoSize;
+            }
+        },
+        //窗口抬起取消事件
+        isMouseDownFn(e,el){
+            if(this.isMouseDown){
+                el.pause();
+                var onjd=e.pageX-this.offset(el).left;
+                onjd = Math.max(0, onjd);
+                onjd = Math.min(onjd, el.offsetWidth);
+                var fuso=onjd/el.offsetWidth*100;
+                var videoSize=(fuso/100*this.player.duraTion);
+                this.player.playTimeLine=fuso;
+
+                el.currentTime=videoSize;
+            }
+            this.isMouseDown=false;
+            el.play();
+            
+        },
+
         //点击音量调整区域事件
         changeMuted(event){
             event = event || window.event;
@@ -199,8 +239,8 @@ export default {
 
         //按下音量调整区域事件
         mutedDown(event){
-            event = event || window.event;
-            this.setSelectable(document.body, false);
+            //event = event || window.event;
+            //this.setSelectable(document.body, false);
         },
 
 
@@ -222,7 +262,6 @@ export default {
         playInit(el){
             //设置初始化声音
             var volumeObj=JSON.parse(getStore('videoVolumeObj'));
-            console.log(volumeObj);
             if(volumeObj.muted){
                 this.player.muted=1;
                 this.player.volume=volumeObj.volumeser;
@@ -413,6 +452,9 @@ export default {
         setItem(el){
             this.player.playTime=el.currentTime;
             this.player.duraTion=el.duration;
+
+            var sekd=this.player.playTime/this.player.duraTion*100;//this.player.playWidth;
+            this.player.playTimeLine=sekd;
         },
         //实时获取video宽度
         getWinWids(num){
@@ -511,7 +553,7 @@ export default {
 
         height: 100%;
         width: 100%;
-        overflow: hidden;
+        //overflow: hidden;
         position: relative;
         .player_video{
             width: 100%;
